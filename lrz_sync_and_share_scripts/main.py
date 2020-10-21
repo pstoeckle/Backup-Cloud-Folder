@@ -12,7 +12,11 @@ from subprocess import call
 
 from click import command, option
 
-basicConfig(level=INFO)
+basicConfig(
+    level=INFO,
+    format="%(asctime)s-%(levelname)s: %(message)s",
+    datefmt="%Y_%m_%d %H:%M",
+)
 _LOGGER = getLogger(__name__)
 
 
@@ -22,18 +26,18 @@ _IGNORED_PATTERNS = {re_compile(r"^~\$.*$")}
 
 
 @option("--source_directory", "-s", default="")
-@option("--target_directory", "-t", default="")
 @option("--git_directory", "-g", default=".")
+@option("--sub_folder", "-S", default="syncandshare")
 @option("--force", "-f", default=False, is_flag=True)
 @command()
 def copy_lrz_sync_and_share(
-    source_directory: str, target_directory: str, git_directory: str, force: bool
+    source_directory: str, git_directory: str, force: bool, sub_folder: str
 ) -> None:
     """
     Hallo
     :return:
     """
-
+    target_directory = join(git_directory, sub_folder)
     if isdir(source_directory):
         is_there_a_new_file = _is_there_a_new_file(source_directory, target_directory)
         if is_there_a_new_file:
