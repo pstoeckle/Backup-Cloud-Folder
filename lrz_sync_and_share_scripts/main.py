@@ -25,17 +25,37 @@ _IGNORED_FILES = {".DS_Store"}
 _IGNORED_PATTERNS = {re_compile(r"^~\$.*$")}
 
 
-@option("--source_directory", "-s", default="")
-@option("--git_directory", "-g", default=".")
-@option("--sub_folder", "-S", default="syncandshare")
-@option("--force", "-f", default=False, is_flag=True)
+@option(
+    "--source_directory",
+    "-s",
+    default="",
+    help="The source directory. Usually, this folder is in LRZ Sync&Share, e.g., '/Users/testuser/LRZ Sync+Share/testfolder'",
+)
+@option(
+    "--git_directory",
+    "-g",
+    default=".",
+    help="The directory under git version control, e.g., /Users/testuser/Documents/git/backup_testfolder",
+)
+@option(
+    "--sub_folder",
+    "-S",
+    default="syncandshare",
+    help="The sub-folder under which the files will be copied.",
+)
+@option(
+    "--force",
+    "-f",
+    default=False,
+    is_flag=True,
+    help="If target already exists, the script will stop. If you have passed the force tag, the script will delete the existing folder.",
+)
 @command()
 def copy_lrz_sync_and_share(
     source_directory: str, git_directory: str, force: bool, sub_folder: str
 ) -> None:
     """
-    Hallo
-    :return:
+    Copies a folder into a git directory and adds new files to stage.
     """
     target_directory = join(git_directory, sub_folder)
     if isdir(source_directory):
