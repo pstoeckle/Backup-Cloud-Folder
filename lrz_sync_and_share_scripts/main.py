@@ -1,6 +1,7 @@
 """
 Copy.
 """
+from logging import INFO, basicConfig, getLogger
 from os import chmod, mkdir, sep, walk
 from os.path import isdir, isfile, join
 from re import compile as re_compile
@@ -10,28 +11,35 @@ from subprocess import call
 
 from click import command, option
 
-_SOURCE_DIRECTORY_OPTION = option("--source_directory", "-s", default="")
-_TARGET_DIRECTORY_OPTION = option("--target_directory", "-t", default="")
-_GIT_DIRECTORY_OPTION = option("--git_directory", "-g", default=".")
+basicConfig(level=INFO)
+_LOGGER = getLogger(__name__)
+
 
 _IGNORED_FOLDERS = {".PowerFolder"}
 _IGNORED_FILES = {".DS_Store"}
 _IGNORED_PATTERNS = {re_compile(r"^~\$.*$")}
 
 
-@_SOURCE_DIRECTORY_OPTION
-@_TARGET_DIRECTORY_OPTION
-@_GIT_DIRECTORY_OPTION
+@option("--source_directory", "-s", default="")
+@option("--target_directory", "-t", default="")
+@option("--git_directory", "-g", default=".")
+@option("--force", "-f", default=False, is_flag=True)
 @command()
 def copy_lrz_sync_and_share(
-    source_directory: str, target_directory: str, git_directory: str
+    source_directory: str, target_directory: str, git_directory: str, force: bool
 ) -> None:
     """
     Hallo
     :return:
     """
-    if not isdir(target_directory):
-        mkdir(target_directory)
+    if isdir(target_directory):
+        if force:
+            _LOGGER.warning(f"The folder {target_directory} was deleted...")
+            rmtree(target_directory)
+        else:
+            _LOGGER.error(f"The folder {target_directory} does exist. Aborting...")
+            exit(1)
+    mkdir(target_directory)
     ignored_parts = set()
     files_for_git = set()
     if isdir(source_directory):
@@ -48,19 +56,21 @@ def copy_lrz_sync_and_share(
             if skip_this_folder:
                 continue
             new_root = root.replace(source_directory, target_directory)
-            if isdir(new_root):
-                rmtree(new_root)
-            mkdir(new_root)
+            if not isdir(new_root):
+                _LOGGER.info(f"Create folder {new_root}")
+                mkdir(new_root)
             for file in [f for f in files if _should_file_be_included(f)]:
                 new_file = join(new_root, file)
                 if isfile(new_file):
                     chmod(new_file, S_IWUSR | S_IRUSR)
-                copy2(join(root, file), new_file)
+                current_file = join(root, file)
+                _LOGGER.info(f"Copy file {current_file} to {new_file}")
+                copy2(current_file, new_file)
                 files_for_git.add(new_file)
         for name in files_for_git:
             chmod(name, S_IRUSR)
             call(["git", "add", name], cwd=git_directory)
-        print(f"#{len(files_for_git)} files added!")
+        _LOGGER.info(f"#{len(files_for_git)} files added!")
 
 
 def _should_file_be_included(f: str) -> bool:
