@@ -1,6 +1,7 @@
 """
 Copy.
 """
+from hashlib import sha1
 from logging import INFO, basicConfig, getLogger
 from os import chmod, mkdir, sep, walk
 from os.path import isdir, isfile, join
@@ -103,7 +104,9 @@ def _is_there_a_new_file(source_directory: str, target_directory: str) -> bool:
             new_file = join(new_root, file)
             current_file = join(root, file)
             if _hash_file(current_file) != _hash_file(new_file):
-                _LOGGER.info(f"File {current_file} and {new_file} have different hashes.")
+                _LOGGER.info(
+                    f"File {current_file} and {new_file} have different hashes."
+                )
                 return True
     return False
 
@@ -116,8 +119,6 @@ def _hash_file(file_name: str) -> str:
     """
     if not isfile(file_name):
         return ""
-    from hashlib import sha1
-
     current_sha = sha1()
     with open(file_name, "rb") as f:
         for chunk in iter(lambda: f.read(4096), b""):
