@@ -10,7 +10,7 @@ from shutil import copy2, rmtree
 from stat import S_IRUSR, S_IWUSR
 from subprocess import call
 
-from click import option, group
+from click import Path, group, option
 
 basicConfig(
     level=INFO,
@@ -37,12 +37,14 @@ def main_group() -> None:
     "-s",
     default="",
     help="The source directory. Usually, this folder is in LRZ Sync&Share, e.g., '/Users/testuser/LRZ Sync+Share/testfolder'",
+    type=Path(exists=True, file_okay=False, resolve_path=True),
 )
 @option(
     "--git_directory",
     "-g",
     default=".",
     help="The directory under git version control, e.g., /Users/testuser/Documents/git/backup_testfolder",
+    type=Path(exists=True, file_okay=False, resolve_path=True),
 )
 @option(
     "--sub_folder",
@@ -65,55 +67,50 @@ def copy_lrz_sync_and_share(
     Copies a folder into a git directory and adds new files to stage.
     """
     target_directory = join(git_directory, sub_folder)
-    if isdir(source_directory):
-        is_there_a_new_file = _is_there_a_new_file(source_directory, target_directory)
-        if is_there_a_new_file:
-            ignored_parts = set()
-            files_for_git = set()
-            if isdir(target_directory):
-                if force:
-                    _LOGGER.warning(f"The folder {target_directory} was deleted...")
-                    rmtree(target_directory)
-                else:
-                    _LOGGER.error(
-                        f"The folder {target_directory} does exist. Aborting..."
-                    )
-                    exit(1)
-            mkdir(target_directory)
-            for root, dirs, files in walk(source_directory):
-                last_part = root.split(sep)[-1]
-                if last_part in _IGNORED_FOLDERS:
-                    ignored_parts.add(root)
-                    continue
-                skip_this_folder = False
-                for ignored_part in ignored_parts:
-                    if ignored_part in root:
-                        skip_this_folder = True
-                        break
-                if skip_this_folder:
-                    continue
-                new_root = root.replace(source_directory, target_directory)
-                if not isdir(new_root):
-                    _LOGGER.info(f"Create folder {new_root}")
-                    mkdir(new_root)
-                for file in [f for f in files if _should_file_be_included(f)]:
-                    new_file = join(new_root, file)
-                    if isfile(new_file):
-                        chmod(new_file, S_IWUSR | S_IRUSR)
-                    current_file = join(root, file)
-                    copy2(current_file, new_file)
-                    files_for_git.add(new_file)
-                    _LOGGER.debug(f"Copy file {current_file} to {new_file}")
-                for name in files_for_git:
-                    chmod(name, S_IRUSR)
-                    call(["git", "add", name], cwd=git_directory)
-                _LOGGER.info(f"#{len(files_for_git)} files added!")
-        else:
-            _LOGGER.info(
-                "There was no new file in the source directory. Thus, we have nothing to do ..."
-            )
+    is_there_a_new_file = _is_there_a_new_file(source_directory, target_directory)
+    if is_there_a_new_file:
+        ignored_parts = set()
+        files_for_git = set()
+        if isdir(target_directory):
+            if force:
+                _LOGGER.warning(f"The folder {target_directory} was deleted...")
+                rmtree(target_directory)
+            else:
+                _LOGGER.error(f"The folder {target_directory} does exist. Aborting...")
+                exit(1)
+        mkdir(target_directory)
+        for root, dirs, files in walk(source_directory):
+            last_part = root.split(sep)[-1]
+            if last_part in _IGNORED_FOLDERS:
+                ignored_parts.add(root)
+                continue
+            skip_this_folder = False
+            for ignored_part in ignored_parts:
+                if ignored_part in root:
+                    skip_this_folder = True
+                    break
+            if skip_this_folder:
+                continue
+            new_root = root.replace(source_directory, target_directory)
+            if not isdir(new_root):
+                _LOGGER.info(f"Create folder {new_root}")
+                mkdir(new_root)
+            for file in [f for f in files if _should_file_be_included(f)]:
+                new_file = join(new_root, file)
+                if isfile(new_file):
+                    chmod(new_file, S_IWUSR | S_IRUSR)
+                current_file = join(root, file)
+                copy2(current_file, new_file)
+                files_for_git.add(new_file)
+                _LOGGER.debug(f"Copy file {current_file} to {new_file}")
+            for name in files_for_git:
+                chmod(name, S_IRUSR)
+                call(["git", "add", name], cwd=git_directory)
+            _LOGGER.info(f"#{len(files_for_git)} files added!")
     else:
-        _LOGGER.critical(f"Source directory {source_directory} does not exist.")
+        _LOGGER.info(
+            "There was no new file in the source directory. Thus, we have nothing to do ..."
+        )
 
 
 def _is_there_a_new_file(source_directory: str, target_directory: str) -> bool:
