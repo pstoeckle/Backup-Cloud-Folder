@@ -10,7 +10,7 @@ from shutil import copy2, rmtree
 from stat import S_IRUSR, S_IWUSR
 from subprocess import call
 
-from click import command, option
+from click import option, group
 
 basicConfig(
     level=INFO,
@@ -23,6 +23,13 @@ _LOGGER = getLogger(__name__)
 _IGNORED_FOLDERS = {".PowerFolder"}
 _IGNORED_FILES = {".DS_Store"}
 _IGNORED_PATTERNS = {re_compile(r"^~\$.*$")}
+
+
+@group()
+def main_group() -> None:
+    """
+    Scripts for LRZ Sync&Share
+    """
 
 
 @option(
@@ -50,7 +57,7 @@ _IGNORED_PATTERNS = {re_compile(r"^~\$.*$")}
     is_flag=True,
     help="If target already exists, the script will stop. If you have passed the force tag, the script will delete the existing folder.",
 )
-@command()
+@main_group.command()
 def copy_lrz_sync_and_share(
     source_directory: str, git_directory: str, force: bool, sub_folder: str
 ) -> None:
@@ -160,4 +167,4 @@ def _should_file_be_included(f: str) -> bool:
 
 
 if __name__ == "__main__":
-    copy_lrz_sync_and_share()
+    main_group()

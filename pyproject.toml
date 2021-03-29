@@ -5,7 +5,7 @@ description = ""
 authors = ["Patrick Stoeckle <patrick.stoeckle@tum.de>"]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = ">=3.7,<4.0"
 click = "^7.1.2"
 
 [tool.poetry.dev-dependencies]
@@ -13,3 +13,6 @@ click = "^7.1.2"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+lrz-sync-and-share-scripts = 'lrz_sync_and_share_scripts.main:main_group'
