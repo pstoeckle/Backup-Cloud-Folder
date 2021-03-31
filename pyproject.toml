@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "lrz-sync-and-share-scripts"
-version = "0.1.0"
+version = "0.1.1"
 description = ""
 authors = ["Patrick Stoeckle <patrick.stoeckle@tum.de>"]
 
