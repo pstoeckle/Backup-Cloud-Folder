@@ -17,9 +17,8 @@ _IGNORED_PATTERNS = {re_compile(r"^~\$.*$")}
 _LOGGER = getLogger(__name__)
 
 
-def copy_lrz_sync_and_share_internal(
-    force: bool, git_directory: str, source_directory: str, sub_folder: str
-) -> None:
+def copy_lrz_sync_and_share_internal(force: bool, git_directory: str, source_directory: str, sub_folder: str,
+                                     read_only) -> None:
     target_directory = join(git_directory, sub_folder)
     is_there_a_new_file = _is_there_a_new_file(source_directory, target_directory)
     if is_there_a_new_file:
@@ -58,7 +57,8 @@ def copy_lrz_sync_and_share_internal(
                 files_for_git.add(new_file)
                 _LOGGER.debug(f"Copy file {current_file} to {new_file}")
             for name in files_for_git:
-                chmod(name, S_IRUSR)
+                if read_only:
+                    chmod(name, S_IRUSR)
                 call(["git", "add", name], cwd=git_directory)
             _LOGGER.info(f"#{len(files_for_git)} files added!")
     else:

@@ -51,14 +51,21 @@ def main_group() -> None:
     is_flag=True,
     help="If target already exists, the script will stop. If you have passed the force tag, the script will delete the existing folder.",
 )
+@option(
+    "--read-only",
+    "-r",
+    default=False,
+    is_flag=True,
+    help="Make files read-only",
+)
 @main_group.command()
 def copy_lrz_sync_and_share(
-    source_directory: str, git_directory: str, force: bool, sub_folder: str
+    source_directory: str, git_directory: str, force: bool, sub_folder: str, read_only: bool
 ) -> None:
     """
     Copies a folder into a git directory and adds new files to stage.
     """
-    copy_lrz_sync_and_share_internal(force, git_directory, source_directory, sub_folder)
+    copy_lrz_sync_and_share_internal(force, git_directory, source_directory, sub_folder, read_only)
 
 
 if __name__ == "__main__":
