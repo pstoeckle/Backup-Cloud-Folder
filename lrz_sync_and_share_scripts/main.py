@@ -1,7 +1,7 @@
 """
 Copy.
 """
-from logging import INFO, basicConfig, getLogger
+from logging import CRITICAL, DEBUG, ERROR, INFO, WARNING, basicConfig, getLogger, root
 from typing import Any
 
 from click import Context, Path, echo, group, option
@@ -33,12 +33,48 @@ def _print_version(ctx: Context, _: Any, value: Any) -> None:
     ctx.exit()
 
 
+def _set_log_level(ctx: Context, _: Any, value: int) -> None:
+    """
+
+    :param ctx:
+    :param _:
+    :param value:
+    :return:
+    """
+    if not value or ctx.resilient_parsing:
+        return
+    level = INFO
+    if value == 1:
+        level = CRITICAL
+    elif value == 2:
+        level = ERROR
+    elif value == 3:
+        level = WARNING
+    elif value == 4:
+        level = INFO
+    elif value == 5:
+        level = DEBUG
+
+    for logger in (getLogger(name) for name in root.manager.loggerDict):
+        logger.setLevel(level)
+
+
 @option(
     "--version",
+    "-v",
     is_flag=True,
     callback=_print_version,
     expose_value=False,
     is_eager=True,
+    help="Log level",
+)
+@option(
+    "--log-level",
+    "-l",
+    count=True,
+    callback=_set_log_level,
+    is_eager=True,
+    expose_value=False,
     help="Version",
 )
 @group()
@@ -46,6 +82,7 @@ def main_group() -> None:
     """
     Scripts for LRZ Sync&Share
     """
+    pass
 
 
 @option(
