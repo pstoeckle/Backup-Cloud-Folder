@@ -2,9 +2,11 @@
 Copy.
 """
 from logging import INFO, basicConfig, getLogger
+from typing import Any
 
-from click import Path, group, option
+from click import Context, Path, echo, group, option
 
+from lrz_sync_and_share_scripts import __version__
 from lrz_sync_and_share_scripts.logic.copy_lrz_sync_and_share import (
     copy_lrz_sync_and_share_internal,
 )
@@ -17,6 +19,28 @@ basicConfig(
 _LOGGER = getLogger(__name__)
 
 
+def _print_version(ctx: Context, _: Any, value: Any) -> None:
+    """
+
+    :param ctx:
+    :param _:
+    :param value:
+    :return:
+    """
+    if not value or ctx.resilient_parsing:
+        return
+    echo(__version__)
+    ctx.exit()
+
+
+@option(
+    "--version",
+    is_flag=True,
+    callback=_print_version,
+    expose_value=False,
+    is_eager=True,
+    help="Version",
+)
 @group()
 def main_group() -> None:
     """
@@ -60,12 +84,18 @@ def main_group() -> None:
 )
 @main_group.command()
 def copy_lrz_sync_and_share(
-    source_directory: str, git_directory: str, force: bool, sub_folder: str, read_only: bool
+    source_directory: str,
+    git_directory: str,
+    force: bool,
+    sub_folder: str,
+    read_only: bool,
 ) -> None:
     """
     Copies a folder into a git directory and adds new files to stage.
     """
-    copy_lrz_sync_and_share_internal(force, git_directory, source_directory, sub_folder, read_only)
+    copy_lrz_sync_and_share_internal(
+        force, git_directory, source_directory, sub_folder, read_only
+    )
 
 
 if __name__ == "__main__":
