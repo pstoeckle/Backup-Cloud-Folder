@@ -2,6 +2,22 @@
 
 The idea of this repository is to gather scripts related to [LRZ Sync&Share](https://syncandshare.lrz.de/).
 
+```bash
+lrz-sync-and-share-scripts --help
+Usage: lrz-sync-and-share-scripts [OPTIONS] COMMAND [ARGS]...
+
+  Scripts for LRZ Sync&Share
+
+Options:
+  --version  Version
+  --help     Show this message and exit.
+
+Commands:
+  copy-lrz-sync-and-share  Copies a folder into a git directory and adds
+                           new...
+```
+
+
 ## Backup Folder
 
 The first script can be used to copy a folder, e.g., a folder in LRZ Sync&Share, to a folder under git version control.
@@ -15,27 +31,30 @@ Otherwise, changes from other collaborators will not be reflected in your histor
 The command is the following:
 
 ```bash
-python ./lrz_sync_and_share_scripts/main.py --help
-Usage: main.py [OPTIONS]
+$ lrz-sync-and-share-scripts copy-lrz-sync-and-share --help
+Usage: lrz-sync-and-share-scripts copy-lrz-sync-and-share [OPTIONS]
 
   Copies a folder into a git directory and adds new files to stage.
 
 Options:
-  -f, --force                  If target already exists, the script will stop.
-                               If you have passed the force tag, the script
-                               will delete the existing folder.
+  -r, --read-only                 Make files read-only
+  -f, --force                     If target already exists, the script will
+                                  stop. If you have passed the force tag, the
+                                  script will delete the existing folder.
 
-  -S, --sub_folder TEXT        The sub-folder under which the files will be
-                               copied.
+  -S, --sub_folder TEXT           The sub-folder under which the files will be
+                                  copied.
 
-  -g, --git_directory TEXT     The directory under git version control, e.g.,
-                               /Users/testuser/Documents/git/backup_testfolder
+  -g, --git_directory DIRECTORY   The directory under git version control,
+                                  e.g., /Users/testuser/Documents/git/backup_t
+                                  estfolder
 
-  -s, --source_directory TEXT  The source directory. Usually, this folder is
-                               in LRZ Sync&Share, e.g., '/Users/testuser/LRZ
-                               Sync+Share/testfolder'
+  -s, --source_directory DIRECTORY
+                                  The source directory. Usually, this folder
+                                  is in LRZ Sync&Share, e.g.,
+                                  '/Users/testuser/LRZ Sync+Share/testfolder'
 
-  --help                       Show this message and exit.
+  --help                          Show this message and exit.
 ```
 
 ### Example
@@ -43,7 +62,7 @@ Options:
 An example could be
 
 ```bash
-python ./lrz_sync_and_share_scripts/main.py \
+lrz-sync-and-share-scripts \
   --source_directory /Users/testuser/LRZ\ Sync+Share/test_folder \
   --git_directory /Users/testuser/Documents/git/test_folder_backup \
   --force
@@ -58,7 +77,7 @@ This will result in the creation of a folder called `/Users/testuser/Documents/g
   ```bash
   PATH=/path/to/your/python/
   cd /path/to/this/project/ || exit 1
-  python ./lrz_sync_and_share_scripts/main.py \
+  lrz-sync-and-share-scripts \
     --source_directory /Users/testuser/LRZ\ Sync+Share/test_folder \
     --git_directory /Users/testuser/Documents/git/test_folder_backup \
     --force
