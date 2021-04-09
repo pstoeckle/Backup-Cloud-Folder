@@ -17,8 +17,13 @@ _IGNORED_PATTERNS = {re_compile(r"^~\$.*$")}
 _LOGGER = getLogger(__name__)
 
 
-def copy_lrz_sync_and_share_internal(force: bool, git_directory: str, source_directory: str, sub_folder: str,
-                                     read_only) -> None:
+def copy_lrz_sync_and_share_internal(
+    force: bool,
+    git_directory: str,
+    source_directory: str,
+    sub_folder: str,
+    read_only: bool,
+) -> None:
     target_directory = join(git_directory, sub_folder)
     is_there_a_new_file = _is_there_a_new_file(source_directory, target_directory)
     if is_there_a_new_file:
