@@ -55,7 +55,7 @@ def _set_log_level(ctx: Context, _: Any, value: int) -> None:
     elif value == 5:
         level = DEBUG
 
-    for logger in (getLogger(name) for name in root.manager.loggerDict):
+    for logger in (getLogger(name) for name in root.manager.loggerDict):  # type: ignore
         logger.setLevel(level)
 
 
