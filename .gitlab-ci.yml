@@ -3,6 +3,8 @@ stages:
 - build
 - deploy
 
+image: gitlab.lrz.de:5005/i4/software/docker-images/python3.9-poetry
+
 python:quality:
     artifacts:
         reports:
@@ -15,7 +17,6 @@ python:quality:
         paths:
             - ".venv"
     coverage: '/line-rate="0.([0-9]{1,2})\d*"/'
-    image: gitlab.lrz.de:5005/i4/software/docker-images/python3.9-poetry
     needs: [ ]
     rules: &python-rules
         -   changes:
@@ -36,7 +37,6 @@ python:build:
             - dist
         expire_in: 3 days
     cache: *python-cache
-    image: gitlab.lrz.de:5005/i4/software/docker-images/python3.9-poetry
     needs:
         - python:quality
     rules: *python-rules
@@ -47,7 +47,6 @@ python:build:
 
 python:deploy:
     cache: *python-cache
-    image: gitlab.lrz.de:5005/i4/software/docker-images/python3.9-poetry
     rules:
         -   if: '$CI_COMMIT_BRANCH == "master"'
     script:
