@@ -8,12 +8,18 @@ from re import compile as re_compile
 from shutil import copy2, rmtree
 from stat import S_IRUSR, S_IWUSR
 from subprocess import call
+from typing import AbstractSet, Pattern
 
 from lrz_sync_and_share_scripts.utils.hash_file import hash_file
 
 _IGNORED_FOLDERS = {".PowerFolder"}
 _IGNORED_FILES = {".DS_Store"}
-_IGNORED_PATTERNS = {re_compile(r"^~\$.*$")}
+_IGNORED_PATTERNS: AbstractSet[Pattern[str]] = frozenset(
+    (
+        re_compile(r"^~\$.*$"),
+        re_compile(r".[A-Z0-9]+-[A-Z0-9]+-[A-Z0-9]+-[A-Z0-9]+-[A-Z0-9]+"),
+    )
+)
 _LOGGER = getLogger(__name__)
 
 
