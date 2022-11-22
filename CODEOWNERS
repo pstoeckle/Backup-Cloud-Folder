@@ -1,0 +1,5 @@
+backup_cloud_folder/ @pstoeckle
+CODEOWNERS @pstoeckle
+LICENSE @pstoeckle
+pyproject.toml @pstoeckle
+README.md @pstoeckle
