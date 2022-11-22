@@ -1,24 +1,32 @@
-# LRZ Sync&Share Scripts
+# Backup Cloud Folder
 
-The idea of this repository is to gather scripts related to [LRZ Sync&Share](https://syncandshare.lrz.de/).
+During my time at the [Technical University of Munich (TUM)](https://www.tum.de/en/), I often collaborated with others using tools like [LRZ Sync&Share](https://syncandshare.lrz.de/) or [Microsoft 365](https://www.office.com/).
+Since I wanted to have a local copy of the files and git version history, I copied the files in a directory under git version control.
+Later, I wrote this script to automate this process.
 
-```bash
-lrz-sync-and-share-scripts --help
-Usage: lrz-sync-and-share-scripts [OPTIONS] COMMAND [ARGS]...
+## Usage
 
-  Scripts for LRZ Sync&Share
+```shell
+$ backup-cloud-folder --help
+Usage: backup-cloud-folder [OPTIONS] COMMAND [ARGS]...
+
+  Script to create a local backup of a cloud folder.
 
 Options:
-  --version  Version
-  --help     Show this message and exit.
+  --version                       Version
+  --install-completion [bash|zsh|fish|powershell|pwsh]
+                                  Install completion for the specified shell.
+  --show-completion [bash|zsh|fish|powershell|pwsh]
+                                  Show completion for the specified shell, to
+                                  copy it or customize the installation.
+  --help                          Show this message and exit.
 
 Commands:
-  copy-lrz-sync-and-share  Copies a folder into a git directory and adds
-                           new...
+  copy-cloud-folder  Copies a folder into a git directory and adds new...
 ```
 
 
-## Backup Folder
+### Copy Cloud Folder
 
 The first script can be used to copy a folder, e.g., a folder in LRZ Sync&Share, to a folder under git version control.
 You can execute the script periodically with [cron](https://en.wikipedia.org/wiki/Cron).
@@ -26,55 +34,49 @@ In this case, you will have periodic commits and a git history for your LRZ Sync
 **Notabene:** The Sync&Share client has to be running.
 Otherwise, changes from other collaborators will not be reflected in your history.
 
-### Command
-
 The command is the following:
 
-```bash
-$ lrz-sync-and-share-scripts copy-lrz-sync-and-share --help
-Usage: lrz-sync-and-share-scripts copy-lrz-sync-and-share [OPTIONS]
+```shell
+$ backup-cloud-folder copy-cloud-folder --help
+Usage: backup-cloud-folder copy-cloud-folder [OPTIONS]
 
   Copies a folder into a git directory and adds new files to stage.
 
 Options:
-  -r, --read-only                 Make files read-only
-  -f, --force                     If target already exists, the script will
-                                  stop. If you have passed the force tag, the
-                                  script will delete the existing folder.
-
-  -S, --sub_folder TEXT           The sub-folder under which the files will be
-                                  copied.
-
-  -g, --git_directory DIRECTORY   The directory under git version control,
-                                  e.g., /Users/testuser/Documents/git/backup_t
-                                  estfolder
-
-  -s, --source_directory DIRECTORY
+  -s, --source-directory DIRECTORY
                                   The source directory. Usually, this folder
                                   is in LRZ Sync&Share, e.g.,
                                   '/Users/testuser/LRZ Sync+Share/testfolder'
-
+  -g, --git-directory DIRECTORY   The directory under git version control,
+                                  e.g., /Users/testuser/Documents/git/backup_t
+                                  estfolder  [default: .]
+  -f, --force                     If target already exists, the script will
+                                  stop. If you have passed the force tag, the
+                                  script will delete the existing folder.
+  -S, --sub-folder TEXT           The sub-folder under which the files will be
+                                  copied.  [default: syncandshare]
+  -r, --read-only                 Make files read-only
   --help                          Show this message and exit.
 ```
 
-### Example
+#### Copy Cloud Folder: Example
 
 An example could be
 
-```bash
-lrz-sync-and-share-scripts \
-  --source_directory /Users/testuser/LRZ\ Sync+Share/test_folder \
-  --git_directory /Users/testuser/Documents/git/test_folder_backup \
+```shell
+backup-cloud-folder copy-cloud-folder \
+  --source-directory /Users/testuser/LRZ\ Sync+Share/test_folder \
+  --git-directory /Users/testuser/Documents/git/test_folder_backup \
   --force
 ```
 
 This will result in the creation of a folder called `/Users/testuser/Documents/git/test_folder_backup/syncandshare` which contains a copy of all the files in `/Users/testuser/LRZ\ Sync+Share/test_folder`.
 
-### Cron
+#### Copy Cloud Folder: Cron
 
 1. You create script, e.g., `commit.sh` with this content.
 
-  ```bash
+  ```shell
   PATH=/path/to/your/python/
   cd /path/to/this/project/ || exit 1
   lrz-sync-and-share-scripts \
@@ -87,12 +89,16 @@ This will result in the creation of a folder called `/Users/testuser/Documents/g
 
 2. You open the cron service
 
-  ```bash
+  ```shell
   crontab -e
   ```
 
 3. Add a line for your script, e.g.,
 
-  ```bash
+  ```shell
   1/10  8-20  * * 1-5 /path/to/commit.sh >> /path/to/commit.log 2>&1
   ```
+
+## Contact
+
+If you have any question, please contact [Patrick Stöckle](mailto:patrick.stoeckle@posteo.de).
