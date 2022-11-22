@@ -1,6 +1,7 @@
 """
 Copy.
 """
+import pathlib
 from logging import getLogger
 from os import chmod, mkdir, sep, walk
 from os.path import isdir, isfile, join
@@ -25,12 +26,12 @@ _LOGGER = getLogger(__name__)
 
 def copy_lrz_sync_and_share_internal(
     force: bool,
-    git_directory: str,
-    source_directory: str,
+    git_directory: pathlib.Path,
+    source_directory: pathlib.Path,
     sub_folder: str,
     read_only: bool,
 ) -> None:
-    target_directory = join(git_directory, sub_folder)
+    target_directory = git_directory.joinpath(sub_folder)
     is_there_a_new_file = _is_there_a_new_file(source_directory, target_directory)
     if is_there_a_new_file:
         ignored_parts = set()
@@ -55,7 +56,7 @@ def copy_lrz_sync_and_share_internal(
                     break
             if skip_this_folder:
                 continue
-            new_root = root.replace(source_directory, target_directory)
+            new_root = root.replace(str(source_directory), str(target_directory))
             if not isdir(new_root):
                 _LOGGER.info(f"Create folder {new_root}")
                 mkdir(new_root)
@@ -78,7 +79,7 @@ def copy_lrz_sync_and_share_internal(
         )
 
 
-def _is_there_a_new_file(source_directory: str, target_directory: str) -> bool:
+def _is_there_a_new_file(source_directory: pathlib.Path, target_directory: pathlib.Path) -> bool:
     ignored_parts = set()
     for root, dirs, files in walk(source_directory):
         last_part = root.split(sep)[-1]
@@ -92,7 +93,7 @@ def _is_there_a_new_file(source_directory: str, target_directory: str) -> bool:
                 break
         if skip_this_folder:
             continue
-        new_root = root.replace(source_directory, target_directory)
+        new_root = root.replace(str(source_directory), str(target_directory))
         for file in [f for f in files if _should_file_be_included(f)]:
             new_file = join(new_root, file)
             current_file = join(root, file)

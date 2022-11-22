@@ -1,15 +1,12 @@
 """
 Copy.
 """
-from logging import CRITICAL, DEBUG, ERROR, INFO, WARNING, basicConfig, getLogger, root
-from typing import Any
-
-from click import Context, Path, echo, group, option
+from logging import INFO, basicConfig, getLogger
+from pathlib import Path
 
 from backup_cloud_folder import __version__
-from backup_cloud_folder.logic.copy_cloud_folder import (
-    copy_lrz_sync_and_share_internal,
-)
+from backup_cloud_folder.logic.copy_cloud_folder import copy_lrz_sync_and_share_internal
+from typer import Exit, Option, Typer, echo
 
 basicConfig(
     level=INFO,
@@ -19,113 +16,72 @@ basicConfig(
 _LOGGER = getLogger(__name__)
 
 
-def _print_version(ctx: Context, _: Any, value: Any) -> None:
+app = Typer()
+
+
+def _version_callback(value: bool) -> None:
+    if value:
+        echo(f"backup-cloud-folder {__version__}")
+        raise Exit()
+
+
+@app.callback()
+def _call_back(
+    _: bool = Option(
+        None,
+        "--version",
+        is_flag=True,
+        callback=_version_callback,
+        expose_value=False,
+        is_eager=True,
+        help="Version",
+    )
+) -> None:
+    """
+    Script to create a local backup of a cloud folder.
     """
 
-    :param ctx:
-    :param _:
-    :param value:
-    :return:
-    """
-    if not value or ctx.resilient_parsing:
-        return
-    echo(__version__)
-    ctx.exit()
 
-
-def _set_log_level(ctx: Context, _: Any, value: int) -> None:
-    """
-
-    :param ctx:
-    :param _:
-    :param value:
-    :return:
-    """
-    if not value or ctx.resilient_parsing:
-        return
-    level = INFO
-    if value == 1:
-        level = CRITICAL
-    elif value == 2:
-        level = ERROR
-    elif value == 3:
-        level = WARNING
-    elif value == 4:
-        level = INFO
-    elif value == 5:
-        level = DEBUG
-
-    for logger in (getLogger(name) for name in root.manager.loggerDict):  # type: ignore
-        logger.setLevel(level)
-
-
-@option(
-    "--version",
-    "-v",
-    is_flag=True,
-    callback=_print_version,
-    expose_value=False,
-    is_eager=True,
-    help="Log level",
-)
-@option(
-    "--log-level",
-    "-l",
-    count=True,
-    callback=_set_log_level,
-    is_eager=True,
-    expose_value=False,
-    help="Version",
-)
-@group()
-def main_group() -> None:
-    """
-    Scripts for LRZ Sync&Share
-    """
-    pass
-
-
-@option(
-    "--source_directory",
-    "-s",
-    default="",
-    help="The source directory. Usually, this folder is in LRZ Sync&Share, e.g., '/Users/testuser/LRZ Sync+Share/testfolder'",
-    type=Path(exists=True, file_okay=False, resolve_path=True),
-)
-@option(
-    "--git_directory",
-    "-g",
-    default=".",
-    help="The directory under git version control, e.g., /Users/testuser/Documents/git/backup_testfolder",
-    type=Path(exists=True, file_okay=False, resolve_path=True),
-)
-@option(
-    "--sub_folder",
-    "-S",
-    default="syncandshare",
-    help="The sub-folder under which the files will be copied.",
-)
-@option(
-    "--force",
-    "-f",
-    default=False,
-    is_flag=True,
-    help="If target already exists, the script will stop. If you have passed the force tag, the script will delete the existing folder.",
-)
-@option(
-    "--read-only",
-    "-r",
-    default=False,
-    is_flag=True,
-    help="Make files read-only",
-)
-@main_group.command()
-def copy_lrz_sync_and_share(
-    source_directory: str,
-    git_directory: str,
-    force: bool,
-    sub_folder: str,
-    read_only: bool,
+@app.command()
+def copy_cloud_folder(
+    source_directory: Path = Option(
+        "",
+        "--source-directory",
+        "-s",
+        help="The source directory. Usually, this folder is in LRZ Sync&Share, e.g., '/Users/testuser/LRZ Sync+Share/testfolder'",
+        exists=True,
+        file_okay=False,
+        resolve_path=True,
+    ),
+    git_directory: Path = Option(
+        ".",
+        "--git-directory",
+        "-g",
+        help="The directory under git version control, e.g., /Users/testuser/Documents/git/backup_testfolder",
+        exists=True,
+        file_okay=False,
+        resolve_path=True,
+    ),
+    force: bool = Option(
+        False,
+        "--force",
+        "-f",
+        is_flag=True,
+        help="If target already exists, the script will stop. If you have passed the force tag, the script will delete the existing folder.",
+    ),
+    sub_folder: str = Option(
+        "syncandshare",
+        "--sub-folder",
+        "-S",
+        help="The sub-folder under which the files will be copied.",
+    ),
+    read_only: bool = Option(
+        False,
+        "--read-only",
+        "-r",
+        is_flag=True,
+        help="Make files read-only",
+    ),
 ) -> None:
     """
     Copies a folder into a git directory and adds new files to stage.
@@ -136,4 +92,4 @@ def copy_lrz_sync_and_share(
 
 
 if __name__ == "__main__":
-    main_group()
+    app()
