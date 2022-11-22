@@ -10,7 +10,7 @@ from stat import S_IRUSR, S_IWUSR
 from subprocess import call
 from typing import AbstractSet, Pattern
 
-from lrz_sync_and_share_scripts.utils.hash_file import hash_file
+from backup_cloud_folder.utils.hash_file import hash_file
 
 _IGNORED_FOLDERS = {".PowerFolder"}
 _IGNORED_FILES = {".DS_Store"}

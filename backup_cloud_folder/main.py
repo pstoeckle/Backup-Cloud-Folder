@@ -6,8 +6,8 @@ from typing import Any
 
 from click import Context, Path, echo, group, option
 
-from lrz_sync_and_share_scripts import __version__
-from lrz_sync_and_share_scripts.logic.copy_lrz_sync_and_share import (
+from backup_cloud_folder import __version__
+from backup_cloud_folder.logic.copy_lrz_sync_and_share import (
     copy_lrz_sync_and_share_internal,
 )
 
