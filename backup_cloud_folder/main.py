@@ -7,7 +7,7 @@ from typing import Any
 from click import Context, Path, echo, group, option
 
 from backup_cloud_folder import __version__
-from backup_cloud_folder.logic.copy_lrz_sync_and_share import (
+from backup_cloud_folder.logic.copy_cloud_folder import (
     copy_lrz_sync_and_share_internal,
 )
 
