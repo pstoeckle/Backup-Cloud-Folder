@@ -1,12 +1,17 @@
 [tool.poetry]
-name = "lrz-sync-and-share-scripts"
-version = "0.1.3"
-description = ""
-authors = ["Patrick Stoeckle <patrick.stoeckle@tum.de>"]
+name = "backup-cloud-folder"
+version = "0.1.4"
+description = "Script to create a local backup of a cloud folder."
+authors = ["Patrick Stöckle <patrick.stoeckle@posteo.de>"]
+maintainers = ["Patrick Stöckle <patrick.stoeckle@posteo.de>"]
+repository = "https://github.com/pstoeckle/backup-cloud-folder.git"
+readme = "README.md"
+license = "Apache-2.0"
 
 [tool.poetry.dependencies]
 python = ">=3.7,<4.0"
-click = "^7.1.2"
+typer = "^0.7.0"
+
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.790"
@@ -31,4 +36,4 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-lrz-sync-and-share-scripts = 'lrz_sync_and_share_scripts.main:main_group'
+backup-cloud-folder = 'backup_cloud_folder.main:main_group'
