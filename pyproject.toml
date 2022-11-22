@@ -36,4 +36,4 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-backup-cloud-folder = 'backup_cloud_folder.main:main_group'
+backup-cloud-folder = 'backup_cloud_folder.main:app'
